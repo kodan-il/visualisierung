@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <script type="module" src="./index.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/zero-md@3?register"></script>
+    <link rel="icon" type="image/png" href="./favicon.png">
+    <title>Visualization Assignment 3</title>
+</head>
+
+<body class="content">
+    <main>
+        <h2>Assignment 3</h2>
+
+        <svg id="legend"></svg>
+        <svg id="parallel_coordinates"></svg>
+        <svg id="timeseries"></svg>
+
+        <h3>Time Series & Parallel Coordinates</h3>
+        <p>
+            You have seen several techniques for visualizing time series data in the online lecture and been introduced to parallel coordinates, a plot to analyze multi-attribute relations. In this assignment, you're going to visualize weather data using these two types of visualizations and connect them with interaction techniques.  
+        </p>
+        <p>
+            The weather data is loaded for you from the csv file in the <span class="monospace">index.js</span>. The code can also be used to load multiple files at once, even though only one file is actually loaded. You can also try to load the stock data to test how it works. The loaded data is printed to the console. Have a look at the data that is availabe and analyze the attributes to make the best decisions for your newest design. 
+        </p>
+
+        <section>
+            <div class="task">
+                <h3>Task: Create a coordinated multi-view to analyze the weather data.</h3>
+                <p>
+                    It is your task to design and implement the visualization system that allows the user to answer the following questions:
+                    <ol>
+                        <li>
+                            In which year and which weather station the lowest temperatures have been measured?
+                        </li>
+                        <li>
+                            At which stations the air pressure is lowest? Are there seasonal changes in air pressure?
+                        </li>
+                        <li>
+                            Is there some kind of relation between temperature and humidity?
+                        </li>
+                    </ol>
+                </p>
+
+                <p>
+                    <h5>The requirements for the system:</h5>
+                    <ol>
+                        <li>
+                            Implement a parallel coordinate system (20%). 
+                        </li>
+                        <li>
+                            Implement a suitable time visualization (20%). Please defend your choice in the <b>design_choice.md</b> (10%).
+                        </li>
+                        <li>
+                            Connect the visualizations with brushing and linking (25%).
+                        </li>
+                        <li>
+                            Add a possibility to filter per station (10%).
+                        </li>
+                        <li>
+                            Describe the marks and channels of both visualization types in the <b>marks_and_channels.md</b> (10%).
+                        </li>
+                        <li>
+                            Actually answer the questions in the <b>answers.md</b> (5%).
+                        </li>
+                    </ol>
+                </p>
+            </div>
+        </section>
+
+        <section>
+            <zero-md src="design_choice.md">
+                <template>
+                    <link rel="stylesheet" href="./style.css"/>
+                </template>
+            </zero-md>
+        </section>
+
+        <section>
+            <zero-md src="marks_and_channels.md">
+                <template>
+                    <link rel="stylesheet" href="./style.css"/>
+                </template>
+            </zero-md>
+        </section>
+
+        <section>
+            <zero-md src="answers.md">
+                <template>
+                    <link rel="stylesheet" href="./style.css"/>
+                </template>
+            </zero-md>
+        </section>
+       
+    </main>
+</body>
+
+</html>

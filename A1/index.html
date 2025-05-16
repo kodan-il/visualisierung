@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Visualization - Assignment 1</title>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/zero-md@3?register"></script>
+    <link rel="stylesheet" href="style.css"/>
+
+</head>
+<body>
+<main>
+    <header>
+        <h1>Assignment 1</h1>
+        <h4>Content</h4>
+        <ul>
+            <li><a href="#intro">Visualization Design (What-Why-How)</a></li>
+            <li><a href="#tasks">Tasks</a></li>
+            <li><a href="#answer">Your answers</a></li>
+        </ul>
+    </header>
+    <section id="intro">
+        <h2>Visualization Design (What-Why-How)</h2>
+        <p>In the last weeks, you learned a lot about the</p>
+        <ul>
+            <li>what (what kind of data is it?)</li>
+            <li>why (which tasks do you want to perform on the data?)</li>
+            <li>how (how to encode data with marks & channels, how to manipulate, facet and reduce your data)</li>
+        </ul>
+        <p>In this assignment, you will put these skills to use to create your own visualization design.</p>
+        <p>When you are finished, zip the assignment's folder <u>(all given files, + your sketches, - the node_modules folder)</u>
+            and <b>upload the zip file to the Moodle platform by Wednesday 23rd April, 23:59</b>.</p>
+        <p>If you have questions regarding the tasks, please ask us directly in the lab class sessions or use the forums on Moodle, such that all students can benefit from the answer.</p>
+
+        <p>Also, please prepare your assignments for the next lab class after the deadline. There will be questions about your solutions in the graded test.</p>
+
+    </section>
+    <section id="tasks">
+        <h2>Tasks</h2>
+
+        <h3>Task 1: The What (25%)</h3>
+        <p>Determine the dataset type of the given data (contents of the penguins.csv), the attribute types
+            (categorical, ordinal, quantitative) as well as their ranges / possible attribute values for all the
+            attributes.</p>
+        <p>Write your answer in the file <b>"what.md"</b>.</p>
+
+        <h3>Task 2: The Why (25%)</h3>
+        <h4>Part 1</h4>
+        <p>Data scientists are interested in answering the following two questions:</p>
+        <ul>
+            <li>How many of each penguin species live on which of the three islands?</li>
+            <li>How can the three different penguin species be distinguished?</li>
+            <li>Does the population change over time?</li>
+        </ul>
+        <p>Analyze the type of task in the why of the what-why-how framework (Lecture 1: Slides 42 - 47), by determining at least one target - action pair for each question.</p>
+        <p>Write your answers in the file <b>"why.md"</b>.</p>
+        
+        <h4>Part 2</h4>
+        <p>Now think of two questions that you could answer with this dataset.</p>
+        <p>Write them in the file <b>"why.md"</b>.</p>
+
+        <h3>Task 3: The How (50%)</h3>
+        <h4>Part 1</h4>
+        <p>Consider only the first of the scientist's questions in Task 2.1: <i>How many of each penguin species live on which of the three islands?</i> Please, implement either a scatter plot or bar chart to answer the question. Write your implementation into the <b>index.js</b>. The data has already been loaded for you. You can have a look at the structure of the data in the <b>penguins.csv</b> or the developer console of your browser. </p>
+
+        <svg id="visualization"></svg>
+
+        <p>Write your reasoning as to why you chose the one visualization over the other in the file <b>"how.md"</b>.</p>
+
+        
+        <h4>Part 2</h4>
+        <p>Design (not implement) a system of interlinked visualizations that are able to answer the data scientists questions posed in Task 2.1. Draw a sketch either by hand (and scan / photograph it) or with a graphics program and evaluate it critically. Put your drawing / sketch as image into this folder.</p>
+
+        <p>Determine the <u>marks</u>, <u>channels</u> used, as well as sensible interactions of <u>manipulation</u>, <u>facetting</u> or <u>reducing</u> the data that would help towards the set task.</p>
+        
+        <p>Write your answer in the file <b>"how.md"</b>.</p>
+        
+        
+
+    </section>
+
+    <section id="answer">
+        <h2>Your answers</h2>
+
+        <!-- USE THE MD FILES -->
+        <!-- Here we ONLY DISPLAY your answers written in the what.md, why.md and how.md -->
+        <zero-md src="what.md">
+            <template>
+                <link rel="stylesheet" href="style.css"/>
+            </template>
+        </zero-md>
+        <zero-md src="why.md">
+            <template>
+                <link rel="stylesheet" href="style.css"/>
+            </template>
+        </zero-md>
+        <zero-md src="how.md">
+            <template>
+                <link rel="stylesheet" href="style.css"/>
+            </template>
+        </zero-md>
+    </section>
+
+
+    <script type="module" src="./index.js"></script>
+</main>
+
+</body>
+</html>
