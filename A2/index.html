@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head class="banner">
+    <link rel="stylesheet" href="./style.css">
+    <script type="module" src="./index.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/zero-md@3?register"></script>
+    <link rel="icon" type="image/png" href="./favicon.png">
+    <title>Visualization Exercise</title>
+</head>
+
+<body class="content">
+<main>
+    <h2>Assignment 2</h2>
+
+    <section>
+        <h3>Introduction</h3>
+        <div>
+
+            <p>
+                In this assignment, you will apply multi-attribute data visualizations and
+                practice to implement interaction techniques (manipulation, faceting, reducing)
+                to create an interactive coordinated multi-view.
+            </p>
+
+            <p>
+                To let you apply your theoretical visualization skills, the task will only define
+                affordances. You will yourself decide which way to apply them. Please, be able to
+                defend your choices in visualization terms.
+            </p>
+        </div>
+    </section>
+
+    <section>
+        <div class="task">
+            <h3>Task</h3>
+            <p>
+                Design and implement an interactive, coordinated multi-view on the penguin dataset in <b>"data/penguins.csv"</b>.
+                The interactive visualizations should work towards answering the following questions:
+            </p>
+            <ol>
+                <li>How many of each penguin species live on which of the three islands?</li>
+                <li>How can the three different penguin species be distinguished?</li>
+                <li>Are the penguins' quantitative attributes dependent on the island?</li>
+                <li>Do male and female penguins differ in their quantitative attributes? Is this difference the same for
+                    all species?
+                </li>
+            </ol>
+        </div>
+
+
+    </section>
+
+    <section>
+        <div class="task">
+            <h3>Affordances</h3>
+            <p>
+                The interactive, coordinated multi-view should have the following features:
+            </p>
+            <ol>
+                <li>
+                    At least one heatmap and one scatter plot (25%).
+                </li>
+                <li>
+                    At least three interaction techniques (50%):
+                    <ol>
+                        <li>At least one interaction that leads to manipulation</li>
+                        <li>At least one interaction that leads to faceting</li>
+                        <li>At least one interaction that leads to reducing</li>
+                    </ol>
+                </li>
+                <li>
+                    Transitions between different states of the same visualization (15%).
+                </li>
+            </ol>
+
+            <p>
+                You are <b>not</b> allowed to use html control elements like checkboxes, sliders, or select boxes to
+                trigger interactions.
+                All interactions should be designed using visual elements of your charts.
+            </p>
+            <p>
+                You may create additional svgs to accommodate your different visualizations.
+            </p>
+
+            <p>
+                <i>Hint: We didn't cover many kinds of interactions, yet. In the learning models, you can learn about
+                    click, mouse enter, mouse leave and custom events. You can apply your skills from the module to implement the interactions.
+                </i>
+            </p>
+
+            <p>
+                Please, describe and defend your visualization and interaction design in the <b>"design_choices.md"</b>
+                (10%).
+            </p>
+        </div>
+    </section>
+
+
+    <svg id="visualization"></svg>
+
+    <section>
+        <zero-md src="design_choices.md">
+            <template>
+                <link rel="stylesheet" href="./style.css"/>
+            </template>
+        </zero-md>
+    </section>
+
+</main>
+</body>
+
+
+</html>

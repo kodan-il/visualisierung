@@ -1,0 +1,18 @@
+{
+  "name": "a3",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^6.2.0"
+  },
+  "dependencies": {
+    "d3": "^7.9.0",
+    "zero-md": "^3.1.7"
+  }
+}
