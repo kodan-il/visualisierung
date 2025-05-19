@@ -85,6 +85,7 @@ Promise.all(files.map(d => d3.csv(base_path+d, d3.autoType)))
       .attr('transform', `translate(${margin.left},0)`)
       .call(d3.axisLeft(y));
 
+    const activeStations = new Set(stations);
     // Optional: Add legend
     const legendGroup = legend.selectAll('g')
       .data(stations)
@@ -94,8 +95,17 @@ Promise.all(files.map(d => d3.csv(base_path+d, d3.autoType)))
       .on('click', function(event, d) {
         const lineToToggle = time_vis.selectAll('.line')
           .filter(l => l.station === d);
-          const currentlyVisible = lineToToggle.style('display') !== 'none';
-          lineToToggle.style('display', currentlyVisible ? 'none' : null);
+
+        const currentlyVisible = lineToToggle.style('display') !== 'none';
+        lineToToggle.style('display', currentlyVisible ? 'none' : null);
+
+        // Update legend rectangle fill color
+        d3.select(this).select('rect')
+          .attr('fill', currentlyVisible ? '#eee' : color(d));
+
+        // Update legend text color
+        d3.select(this).select('text')
+          .style('fill', currentlyVisible ? '#ccc' : '#000');
       });
 
     legendGroup.append('rect')
@@ -109,18 +119,46 @@ Promise.all(files.map(d => d3.csv(base_path+d, d3.autoType)))
       .text(d => `Station ${d}`)
       .style('font-size', '12px');
 
+    const initialDomain = x.domain();
+
+
     // Brushing & Linking
     const brush = d3.brushX()
       .extent([[margin.left, margin.top], [width - margin.right, height - margin.bottom]])
       .on('end', event => {
         const selection = event.selection;
-        if (!selection) return;
-          const [x0, x1] = selection.map(x.invert);
-          lines.style('opacity', d =>
-            d.values.some(p => p.DATE >= x0 && p.DATE <= x1) ? 1 : 0.1
-          );
+        if (!selection){
+
+          x.domain(initialDomain);
+
+          time_vis.selectAll('.line')
+            .transition()
+            .duration(750)
+            .attr('d', d=> line(d.values))
+
+          time_vis.select('.x-axis')
+            .transition()
+            .duration(750)
+            .call(d3.axisBottom(x));
+          return;
+        }
+
+        const [x0, x1] = selection.map(x.invert);
+
+        x.domain([x0,x1]);
+
+        time_vis.selectAll('.line')
+          .transition()
+          .duration(750)
+          .attr('d',d => line(d.values));
+
+        time_vis.select('.x-axis')
+          .transition()
+          .duration(750)
+          .call(d3.axisBottom(x))
       });
 
     time_vis.append('g')
+        .attr('class','brush')
         .call(brush);
 });
