@@ -10,9 +10,37 @@ Promise.all(files.map(d => d3.csv(base_path+d, d3.autoType)))
     const data = loadedData[0];
     console.log(data);
 
+    // Ensure DATE is parsed
+    data.forEach(d => {
+        d.DATE = new Date(d.DATE);
+    });
+
     // SVG for showing a color legend, should you use colors
     const legend = d3.select('#legend');
     legend.attr('viewBox', [0, 0, 800, 250]);
+
+    // Group and average per month per station
+    const groupedData = d3.groups(data, d => d.STATION_ID, d => d3.timeMonth(d.DATE));
+
+    // Flatten into new reduced dataset
+    const reducedData = groupedData.flatMap(([station, months]) =>
+        months.map(([month, records]) => {
+            const avg = (key) => d3.mean(records, d => d[key]);
+            return {
+                STATION_ID: station,
+                STATION_NAME: records[0].STATION_NAME,
+                DATE: month,
+                SUNSHINE_DURATION: avg("SUNSHINE_DURATION"),
+                SNOW_DEPTH: avg("SNOW_DEPTH"),
+                PRESSURE_AIR: avg("PRESSURE_AIR"),
+                TEMPERATURE_AIR: avg("TEMPERATURE_AIR"),
+                HUMIDITY: avg("HUMIDITY"),
+                TEMPERATURE_AIR_MAX: avg("TEMPERATURE_AIR_MAX"),
+                TEMPERATURE_AIR_MIN: avg("TEMPERATURE_AIR_MIN")
+            };
+        })
+    );
+
 
     // SVG for plotting the parallel coordinates into
     const pcp = d3.select('#parallel_coordinates');
@@ -25,11 +53,6 @@ Promise.all(files.map(d => d3.csv(base_path+d, d3.autoType)))
     const width = 800;
     const height = 500;
     const margin = { top: 20, right: 30, bottom: 30, left: 50 };
-
-    // Ensure DATE is parsed
-    data.forEach(d => {
-      d.DATE = new Date(d.DATE);
-    });
 
     // Extract unique station IDs
     const stations = Array.from(new Set(data.map(d => d.STATION_ID)));
@@ -86,18 +109,24 @@ Promise.all(files.map(d => d3.csv(base_path+d, d3.autoType)))
       .call(d3.axisLeft(y));
 
     const activeStations = new Set(stations);
-    // Optional: Add legend
+
+    // legend
+    const stationNameMap = new Map(
+        data.map(d => [d.STATION_ID, d.STATION_NAME])
+    );
     const legendGroup = legend.selectAll('g')
       .data(stations)
       .join('g')
       .attr('transform', (d, i) => `translate(0,${i * 20})`)
       .style('cursor', 'pointer')
       .on('click', function(event, d) {
-        const lineToToggle = time_vis.selectAll('.line')
+        const timeSeriesLines = time_vis.selectAll('.line')
           .filter(l => l.station === d);
+        const pcpLines = pcp.selectAll(`.pcp-line.station-${d}`);
 
-        const currentlyVisible = lineToToggle.style('display') !== 'none';
-        lineToToggle.style('display', currentlyVisible ? 'none' : null);
+        const currentlyVisible = timeSeriesLines.style('display') !== 'none';
+        timeSeriesLines.style('display', currentlyVisible ? 'none' : null);
+        pcpLines.style('display', currentlyVisible ? 'none' : null);
 
         // Update legend rectangle fill color
         d3.select(this).select('rect')
@@ -116,7 +145,7 @@ Promise.all(files.map(d => d3.csv(base_path+d, d3.autoType)))
     legendGroup.append('text')
       .attr('x', 20)
       .attr('y', 12)
-      .text(d => `Station ${d}`)
+      .text(d => `Station ${stationNameMap.get(d)}`)
       .style('font-size', '12px');
 
     const initialDomain = x.domain();
@@ -161,4 +190,87 @@ Promise.all(files.map(d => d3.csv(base_path+d, d3.autoType)))
     time_vis.append('g')
         .attr('class','brush')
         .call(brush);
+
+
+    // === PARALLEL COORDINATES PLOT ===
+
+    pcp.attr("viewBox", [0, 0, 800, 500]);
+
+
+    const pcpWidth = 800;
+    const pcpHeight = 500;
+    const pcpMargin = { top: 30, right: 50, bottom: 10, left: 50 };
+    const pcpInnerWidth = pcpWidth - pcpMargin.left - pcpMargin.right;
+    const pcpInnerHeight = pcpHeight - pcpMargin.top - pcpMargin.bottom;
+
+    // Dimensions
+    const dimensions = [
+        "SUNSHINE_DURATION",
+        "SNOW_DEPTH",
+        "PRESSURE_AIR",
+        "TEMPERATURE_AIR",
+        "HUMIDITY",
+        "TEMPERATURE_AIR_MAX",
+        "TEMPERATURE_AIR_MIN"
+    ];
+
+    // Scales per dimension
+    const yScales = {};
+    dimensions.forEach(dim => {
+        yScales[dim] = d3.scaleLinear()
+            .domain(d3.extent(reducedData, d => d[dim]))
+            .range([pcpInnerHeight, 0]);
+    });
+
+    // X scale maps dimension names to horizontal space
+    const xScale = d3.scalePoint()
+        .domain(dimensions)
+        .range([0, pcpInnerWidth]);
+
+
+    const pcpGroup = pcp.append("g")
+        .attr("transform", `translate(${pcpMargin.left},${pcpMargin.top})`);
+
+    // Path generator for each data row
+    function path(d) {
+        return d3.line()(dimensions.map(dim => [xScale(dim), yScales[dim](d[dim])]));
+    }
+
+    // Draw lines
+    pcpGroup.selectAll(".pcp-line")
+        .data(reducedData)
+        .join("path")
+        .attr("class", d => `pcp-line station-${d.STATION_ID}`)
+        .attr("fill", "none")
+        .attr("stroke", d => color(d.STATION_ID))
+        .attr("stroke-width", 1.2)
+        .attr("d", path);
+
+    // Draw axes
+    const axisGroup = pcpGroup.selectAll(".dimension")
+        .data(dimensions)
+        .join("g")
+        .attr("class", "dimension")
+        .attr("transform", d => `translate(${xScale(d)},0)`);
+
+    axisGroup.each(function(d) {
+        d3.select(this).call(d3.axisLeft(yScales[d]));
+    });
+
+    axisGroup.append("text")
+        .attr("y", -10)
+        .style("text-anchor", "middle")
+        .style("font-size", "12px")
+        .text(d => d);
+/*
+    // Legend click: hide/show matching PCP lines
+    legendGroup.on("click", function(event, d) {
+        const currentlyVisible = time_vis.selectAll(".line")
+            .filter(l => l.station === d)
+            .style("display") !== "none";
+
+        // Toggle PCP lines with matching class
+        pcp.selectAll(`.pcp-line.station-${d}`)
+            .style("display", currentlyVisible ? "none" : null);
+    });*/
 });
