@@ -101,8 +101,9 @@ Promise.all(files.map(d => d3.csv(base_path+d, d3.autoType)))
 
     // Draw axes
     time_vis.append('g')
-      .attr('transform', `translate(0,${height - margin.bottom})`)
-      .call(d3.axisBottom(x));
+        .attr('class', 'x-axis') // ⬅️ ini penting
+        .attr('transform', `translate(0,${height - margin.bottom})`)
+        .call(adaptiveTimeAxis(x));
 
     time_vis.append('g')
       .attr('transform', `translate(${margin.left},0)`)
@@ -168,7 +169,7 @@ Promise.all(files.map(d => d3.csv(base_path+d, d3.autoType)))
           time_vis.select('.x-axis')
             .transition()
             .duration(750)
-            .call(d3.axisBottom(x));
+            .call(adaptiveTimeAxis(x));
           return;
         }
 
@@ -184,7 +185,9 @@ Promise.all(files.map(d => d3.csv(base_path+d, d3.autoType)))
         time_vis.select('.x-axis')
           .transition()
           .duration(750)
-          .call(d3.axisBottom(x))
+          .call(d3.axisBottom(x)
+            .ticks(d3.timeMonth)
+            .tickFormat(d3.timeFormat("%b")))
       });
 
     time_vis.append('g')
@@ -192,6 +195,27 @@ Promise.all(files.map(d => d3.csv(base_path+d, d3.autoType)))
         .call(brush);
 
 
+    function adaptiveTimeAxis(xScale) {
+      const [start, end] = xScale.domain();
+      const spanDays = (end - start) / (1000 * 60 * 60 * 24);
+
+      if (spanDays < 60) {
+        // zoom tinggi: tampilkan hari dan bulan
+        return d3.axisBottom(xScale)
+          .ticks(d3.timeWeek.every(1))
+          .tickFormat(d3.timeFormat("%d %b"));
+      } else if (spanDays < 400) {
+        // zoom sedang: tampilkan bulan
+        return d3.axisBottom(xScale)
+          .ticks(d3.timeMonth.every(1))
+          .tickFormat(d3.timeFormat("%b"));
+      } else {
+        // default: tampilkan tahun
+        return d3.axisBottom(xScale)
+          .ticks(d3.timeYear.every(1))
+          .tickFormat(d3.timeFormat("%Y"));
+      }
+    }
     // === PARALLEL COORDINATES PLOT ===
 
     pcp.attr("viewBox", [0, 0, 800, 520]);
