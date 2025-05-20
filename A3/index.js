@@ -200,17 +200,17 @@ Promise.all(files.map(d => d3.csv(base_path+d, d3.autoType)))
       const spanDays = (end - start) / (1000 * 60 * 60 * 24);
 
       if (spanDays < 60) {
-        // zoom tinggi: tampilkan hari dan bulan
+        // show days and months (Deepest)
         return d3.axisBottom(xScale)
           .ticks(d3.timeWeek.every(1))
           .tickFormat(d3.timeFormat("%d %b"));
       } else if (spanDays < 400) {
-        // zoom sedang: tampilkan bulan
+        // Shows only months (medium)
         return d3.axisBottom(xScale)
           .ticks(d3.timeMonth.every(1))
           .tickFormat(d3.timeFormat("%b"));
       } else {
-        // default: tampilkan tahun
+        // Default : Years only
         return d3.axisBottom(xScale)
           .ticks(d3.timeYear.every(1))
           .tickFormat(d3.timeFormat("%Y"));
