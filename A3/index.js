@@ -194,14 +194,22 @@ Promise.all(files.map(d => d3.csv(base_path+d, d3.autoType)))
 
     // === PARALLEL COORDINATES PLOT ===
 
-    pcp.attr("viewBox", [0, 0, 800, 500]);
+    pcp.attr("viewBox", [0, 0, 800, 520]);
 
 
     const pcpWidth = 800;
-    const pcpHeight = 500;
-    const pcpMargin = { top: 30, right: 50, bottom: 10, left: 50 };
+    const pcpHeight = 520;
+    const pcpMargin = { top: 50, right: 50, bottom: 10, left: 50 };
     const pcpInnerWidth = pcpWidth - pcpMargin.left - pcpMargin.right;
     const pcpInnerHeight = pcpHeight - pcpMargin.top - pcpMargin.bottom;
+
+    const infoTextLabel = pcp.append("text")
+        .attr("id", "station-info-label")
+        .attr("x", 10)
+        .attr("y", 20)
+        .style("font", "italic 12px sans-serif")
+        .style("fill", "#989898")
+        .text("No selection");
 
     // Dimensions
     const dimensions = [
@@ -213,6 +221,16 @@ Promise.all(files.map(d => d3.csv(base_path+d, d3.autoType)))
         "TEMPERATURE_AIR_MAX",
         "TEMPERATURE_AIR_MIN"
     ];
+    // Short display labels
+    const dimensionLabels = {
+        SUNSHINE_DURATION: "Sunshine",
+        SNOW_DEPTH: "Snow Depth",
+        PRESSURE_AIR: "Air Pressure",
+        TEMPERATURE_AIR: "Air Temp.",
+        HUMIDITY: "Humidity",
+        TEMPERATURE_AIR_MAX: "Max Air Temp.",
+        TEMPERATURE_AIR_MIN: "Min Air Temp."
+    };
 
     // Scales per dimension
     const yScales = {};
@@ -237,7 +255,7 @@ Promise.all(files.map(d => d3.csv(base_path+d, d3.autoType)))
     }
 
     // Draw lines
-    pcpGroup.selectAll(".pcp-line")
+    const lineSelection = pcpGroup.selectAll(".pcp-line")
         .data(reducedData)
         .join("path")
         .attr("class", d => `pcp-line station-${d.STATION_ID}`)
@@ -245,6 +263,53 @@ Promise.all(files.map(d => d3.csv(base_path+d, d3.autoType)))
         .attr("stroke", d => color(d.STATION_ID))
         .attr("stroke-width", 1.2)
         .attr("d", path);
+
+    // for brushing
+    const brushExtents = {};
+
+    function updateInfoBox() {
+        const visible = reducedData.filter(d =>
+            Object.entries(brushExtents).every(([k, [min, max]]) =>
+                d[k] >= min && d[k] <= max
+            )
+        );
+
+        const total = visible.length;
+        const grouped = d3.rollup(visible, v => v.length, d => d.STATION_ID);
+        const sortedEntries = Array.from(grouped.entries())
+            .sort((a, b) => b[1] - a[1]);
+
+        const infoText = sortedEntries
+            .map(([station, count]) => `Station ${stationNameMap.get(station)}: ${(100 * count / total).toFixed(1)}%`)
+            .join(" | ");
+
+
+        d3.select("#station-info-label")
+            .text(total ? infoText : "No selection");
+    }
+
+    // Brushing logic per axis
+    function brushHandler(dim) {
+        return function(event) {
+            const selection = event.selection;
+            if (selection) {
+                const [y0, y1] = selection;
+                const extent = [yScales[dim].invert(y1), yScales[dim].invert(y0)].sort((a, b) => a - b);
+                brushExtents[dim] = extent;
+            } else {
+                delete brushExtents[dim];
+            }
+
+            // Filter visible lines
+            lineSelection.style("display", d => {
+                return Object.entries(brushExtents).every(([k, [min, max]]) =>
+                    d[k] >= min && d[k] <= max
+                ) ? null : "none";
+            });
+            //TODO: link with timeseries lines
+            updateInfoBox();
+        };
+    }
 
     // Draw axes
     const axisGroup = pcpGroup.selectAll(".dimension")
@@ -254,23 +319,38 @@ Promise.all(files.map(d => d3.csv(base_path+d, d3.autoType)))
         .attr("transform", d => `translate(${xScale(d)},0)`);
 
     axisGroup.each(function(d) {
-        d3.select(this).call(d3.axisLeft(yScales[d]));
+        const g = d3.select(this);
+        g.call(d3.axisLeft(yScales[d]));
+        g.selectAll(".tick text")
+            .style("pointer-events", "none")
+            .style("user-select", "none");
+
+        g.append("g")
+            .attr("class", "brush")
+            .call(d3.brushY()
+                .extent([[ -8, 0], [8, pcpInnerHeight]])
+                .on("brush end", brushHandler(d)));
     });
 
     axisGroup.append("text")
         .attr("y", -10)
         .style("text-anchor", "middle")
         .style("font-size", "12px")
-        .text(d => d);
-/*
-    // Legend click: hide/show matching PCP lines
-    legendGroup.on("click", function(event, d) {
-        const currentlyVisible = time_vis.selectAll(".line")
-            .filter(l => l.station === d)
-            .style("display") !== "none";
+        .style("pointer-events", "none")
+        .style("user-select", "none")
+        .text(d => dimensionLabels[d] || d);
 
-        // Toggle PCP lines with matching class
-        pcp.selectAll(`.pcp-line.station-${d}`)
-            .style("display", currentlyVisible ? "none" : null);
-    });*/
+
+    //right click to reset brushing
+    pcp.on("contextmenu", function(event) {
+        event.preventDefault();
+        Object.keys(brushExtents).forEach(key => delete brushExtents[key]);
+        // Clear all brushes
+        axisGroup.selectAll(".brush")
+            .call(d3.brushY().clear);
+
+        // Show all lines again
+        lineSelection.style("display", null);
+        updateInfoBox();
+    });
 });
