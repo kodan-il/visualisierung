@@ -2,10 +2,11 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" type="text/css" href="style.css" />
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
     <script type="module" src="index.js"></script>
+    <script src="./src/mds.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/numeric/1.2.6/numeric.min.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/zero-md@3?register"></script>
     <title>Assignment 4</title>
@@ -26,70 +27,86 @@
 </head>
 
 <body>
-    <main>
-        <h1>Assignment 4</h1>
+<main>
+    <h1>Assignment 4</h1>
 
-        <section>
-            <h2>Text and Set visualization</h2>
-            <div class="task">
-                <h3>Analyzing movie genres</h3>
-                <p>In this task you will create a system to analyze movie genres via the short texts that describe the movies. You will implement and coordinate
-                    both text and set visualizations to find out about differences between genres and genre combinations.
-                </p>
-                <p>
-                    Your system should be able to answer the following questions: 
-                    <ol>
-                        <li>Are there textual differences - in wording - between different genres or genre combinations?</li>
-                        <li>Which genre combinations are there? And how often do they occur? Do films usually belong to multiple or only one genre?</li>
-                        <li>Can the provided embedding - created with Nomic Embed and t-SNE - capture the differences in genre? For which genres does it work better? For which less so? Can you think of an explanation why?</li>
-                    </ol>
-                </p>
-                <p>The data has already been loaded for you in <code>index.js</code>. We are logging it into the console for you to analyse.</p>
+    <section>
+        <h2>Text and Set visualization</h2>
+        <div class="task">
+            <h3>Analyzing movie genres</h3>
+            <p>In this task you will create a system to analyze movie genres via the short texts that describe the
+                movies. You will implement and coordinate
+                both text and set visualizations to find out about differences between genres and genre combinations.
+            </p>
+            <p>
+                Your system should be able to answer the following questions:
+            <ol>
+                <li>Are there textual differences - in wording - between different genres or genre combinations?</li>
+                <li>Which genre combinations are there? And how often do they occur? Do films usually belong to multiple
+                    or only one genre?
+                </li>
+                <li>Can the provided embedding - created with Nomic Embed and t-SNE - capture the differences in genre?
+                    For which genres does it work better? For which less so? Can you think of an explanation why?
+                </li>
+            </ol>
+            </p>
+            <p>The data has already been loaded for you in <code>index.js</code>. We are logging it into the console for
+                you to analyse.</p>
 
-                <h4>Requirements</h4>
-                <ol>
-                    <li>Implement at least one text and one set visualization side-by-side (so both views are visible at the same time). (50%)</li>
-                    <li>Implement interactions between the visualizations, e.g., selecting a genre in one could trigger a filter in all visualizations. (20%)</li>
-                    <li>Answer the questions (10%)</li>
-                    <li>Describe and defend your design (20%)</li>
-                </ol>
+            <h4>Requirements</h4>
+            <ol>
+                <li>Implement at least one text and one set visualization side-by-side (so both views are visible at the
+                    same time). (50%)
+                </li>
+                <li>Implement interactions between the visualizations, e.g., selecting a genre in one could trigger a
+                    filter in all visualizations. (20%)
+                </li>
+                <li>Answer the questions (10%)</li>
+                <li>Describe and defend your design (20%)</li>
+            </ol>
 
-                <h4>Hints</h4>
-               <p>If you want, you can use the provided functionality for creating word clouds. The function is already loaded for you in the <code>document_embedding.js</code>. 
-                The function <code>wordcloud(svg, word_counts)</code> expects a d3 selection as <i>svg</i> and an array of word counts in the format <i>[[word1, count], [word2, count]...]</i> as <i>word_counts</i>. 
-                For tokenization, feel free to use the function <code>documentToWords(text)</code> that receives the raw text as input and returns an array of single words. 
-                </p>
-                <p>If you want to use <i>tfidf</i>, you can use the <code>tfidf(word_array, idf)</code>. <i>word_array</i> is an array of word counts. <i>idf</i> is a map of 
-                inverse document frequencies that you can calculate using the function <code>inverseDocumentFrequency(grouped_words)</code>. The grouped words is an array of arrays of words [[word1, word2, ...], [word3, word 4...]] 
-            where each word array represents one group that will be contrasted with the tfidf measure.</p>
+            <h4>Hints</h4>
+            <p>If you want, you can use the provided functionality for creating word clouds. The function is already
+                loaded for you in the <code>document_embedding.js</code>.
+                The function <code>wordcloud(svg, word_counts)</code> expects a d3 selection as <i>svg</i> and an array
+                of word counts in the format <i>[[word1, count], [word2, count]...]</i> as <i>word_counts</i>.
+                For tokenization, feel free to use the function <code>documentToWords(text)</code> that receives the raw
+                text as input and returns an array of single words.
+            </p>
+            <p>If you want to use <i>tfidf</i>, you can use the <code>tfidf(word_array, idf)</code>. <i>word_array</i>
+                is an array of word counts. <i>idf</i> is a map of
+                inverse document frequencies that you can calculate using the function <code>inverseDocumentFrequency(grouped_words)</code>.
+                The grouped words is an array of arrays of words [[word1, word2, ...], [word3, word 4...]]
+                where each word array represents one group that will be contrasted with the tfidf measure.</p>
 
-            </div>
-            
-        </section>
+        </div>
 
-            <!-- You may add as many svgs as you like here -->
-            <svg id="vis"></svg>
-            <svg id="genre-selector"></svg>
-            <svg id="wordcloud"></svg>
-            
-             
+    </section>
 
-            <zero-md src=".\design_decisions.md">
-                <template>
-                    <link rel="stylesheet" href="style.css"/>
-                </template>
-            </zero-md>
+    <!-- You may add as many svgs as you like here -->
+    <svg id="vis"></svg>
+    <svg id="genre-selector"></svg>
+    <svg id="wordcloud"></svg>
 
-             <zero-md src=".\answers.md">
-                <template>
-                    <link rel="stylesheet" href="style.css"/>
-                </template>
-            </zero-md>
-            
 
-        <div id="tooltip"></div>
+    <zero-md src=".\design_decisions.md">
+        <template>
+            <link rel="stylesheet" href="style.css"/>
+        </template>
+    </zero-md>
 
-    </main>
+    <zero-md src=".\answers.md">
+        <template>
+            <link rel="stylesheet" href="style.css"/>
+        </template>
+    </zero-md>
+
+
+    <div id="tooltip"></div>
+    <svg id="embedding"></svg>
+
+
+</main>
 </body>
 
 </html>
