@@ -6,12 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" type="text/css" href="style.css" />
     <script type="module" src="index.js"></script>
-    <script src="./src/mds.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/numeric/1.2.6/numeric.min.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/zero-md@3?register"></script>
     <title>Assignment 4</title>
     <style>
-
+        #tooltip {
+            position: absolute;
+            display: none; /* Hidden initially */
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.9); /* White background with some transparency */
+            border: 1px solid #ccc; /* Light border */
+            border-radius: 4px; /* Rounded corners */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Drop shadow */
+            font-size: 13px;
+            pointer-events: none; /* Important - so the tooltip does not block interactions */
+            z-index: 100; /* Ensure the tooltip is on top */
+        }
     </style>
 </head>
 
@@ -54,10 +64,13 @@
             where each word array represents one group that will be contrasted with the tfidf measure.</p>
 
             </div>
+            
         </section>
 
             <!-- You may add as many svgs as you like here -->
             <svg id="vis"></svg>
+            <svg id="genre-selector"></svg>
+            <svg id="wordcloud"></svg>
             
              
 
@@ -74,7 +87,7 @@
             </zero-md>
             
 
-
+        <div id="tooltip"></div>
 
     </main>
 </body>
