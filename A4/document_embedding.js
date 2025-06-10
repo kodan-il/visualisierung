@@ -156,6 +156,7 @@ export function document_embedding({svg, movie_corpus}) {
             g.selectAll("text.level-label")
                 .style("cursor", "pointer")
                 .on("click", function (event, selectedLevel) {
+                    resetBarChart();
                     g.selectAll(".genre-link")
                         .transition()
                         .duration(300)
