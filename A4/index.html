@@ -23,6 +23,17 @@
             pointer-events: none; /* Important - so the tooltip does not block interactions */
             z-index: 100; /* Ensure the tooltip is on top */
         }
+
+        .svg-container {
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: center;    /* Center vertically (if needed) */
+            padding: 0;
+            margin: 0 auto;        /* Center the container */
+            width: 100%;           /* Ensure the container takes up full space */
+            max-width: 1200px;     /* Optional: limit the width */
+            text-align: center;    /* Ensure children are centered as well */
+        }
     </style>
 </head>
 
@@ -99,11 +110,13 @@
 
     <svg id="vis"></svg>
     <svg id="genre-selector"></svg>
-    <svg id="wordcloud"></svg>
-
     <div id="tooltip"></div>
-    <svg id="embedding"></svg>
-
+    <div class="svg-container">
+        <svg id="embedding"></svg>
+    </div>
+    <div class="svg-container">
+        <svg id="wordcloud"></svg>
+    </div>
 
 </main>
 </body>

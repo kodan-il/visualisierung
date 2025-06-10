@@ -5,8 +5,7 @@ import cloud from "d3-cloud";
 
 function renderWordCloud(words, color) {
 
-    console.log(words)
-
+    //console.log(words)
     const width = 500;
     const height = 500;
 
@@ -15,7 +14,9 @@ function renderWordCloud(words, color) {
         .select(`#wordcloud`)
         .attr("width", width)
         .attr("height", height)
-        .style("border", "1px solid #ddd");
+        .style("border", "1px solid #ddd")
+        .style("margin", "0 auto")
+        .style("visibility", "visible");
 
     svg.selectAll("*").remove(); // Clear previous contents of the SVG
 
@@ -23,7 +24,6 @@ function renderWordCloud(words, color) {
     const tooltip = d3.select("#tooltip");
 
     const maxFrequency = Math.max(...words.map(([_, frequency]) => frequency));
-    console.log(maxFrequency);
 
     const minFontSize = 1; // Set the smallest font size
     const maxFontSize = 50; // Set the largest font size
@@ -32,13 +32,12 @@ function renderWordCloud(words, color) {
         .words(
             words.map(([text, frequency]) => {
               const size = minFontSize + (Math.sqrt(frequency) / Math.sqrt(maxFrequency)) * (maxFontSize - minFontSize);
-              console.log(`Word: ${text}, Frequency: ${frequency}, Font Size: ${size}`);
               return {
                 text,
                 size: minFontSize + (frequency / maxFrequency) * (maxFontSize - minFontSize),
               };
             }))
-        .padding(10)
+        .padding(5)
         .rotate(() => (Math.random() > 0.5 ? 0 : 90)) // Randomly rotate words
         .font("Arial")
         .fontSize((d) => d.size)
@@ -85,7 +84,7 @@ function renderWordCloud(words, color) {
     layout.start();
 }
 
-function updateWordCloud(movies, targetGenre, duplicateThreshold, maxWordCount, color) {
+export function updateWordCloud(movies, targetGenre, duplicateThreshold, maxWordCount, color) {
     const uniqueGenres = new Set();
     movies.forEach(movie => {
         if (Array.isArray(movie.genres)) {
@@ -133,9 +132,13 @@ function updateWordCloud(movies, targetGenre, duplicateThreshold, maxWordCount, 
     for (const [genre, wordList] of Object.entries(topSortedWordFrequencies)) {
         updatedTopSortedWordFrequencies[genre] = wordList.filter(([word]) => !commonWords.includes(word)).slice(0, maxWordCount);
     }
-    console.log(updatedTopSortedWordFrequencies);
+    //console.log(updatedTopSortedWordFrequencies);
 
     renderWordCloud(updatedTopSortedWordFrequencies[targetGenre], color);
+}
+
+export function hideWorldCloud(){
+    d3.select("#wordcloud").style("visibility", "hidden");
 }
 
 
@@ -158,11 +161,8 @@ loadMoviesDataset().then((movies) => {
     Array.from(uniqueGenres).forEach((genre, index) => {
       genreColors[genre] = d3.schemeCategory10[index % 10];
     });
+    //console.log(genreColors);
 
-    console.log(genreColors);
-
-    const targetGenre = "Comedy";
-
-    updateWordCloud(movies, targetGenre, 15, 15, genreColors[targetGenre]);
-    //TODO: build world cloud (d3), add genre selector (filter?), add duplicate_threshold?
+    //const targetGenre = "Action";
+    //updateWordCloud(movies, targetGenre, 15, 15, genreColors[targetGenre]);
 });

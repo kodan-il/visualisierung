@@ -6,6 +6,8 @@ import {
 import { wordcloud } from "./src/wordcloud.js";
 
 import * as d3 from "d3"
+import { updateWordCloud } from './index.js';
+import { hideWorldCloud } from "./index.js";
 
 export function document_embedding({svg, movie_corpus}) {
     // log the corpus, so that you can analyse its stucture in the browser
@@ -36,11 +38,13 @@ export function document_embedding({svg, movie_corpus}) {
     const allLevels = Array.from(genreCounts.keys()).sort((a, b) => a - b);
     const allGenres = Array.from(genreTotals.keys()).sort();
 
-    const width = 1400;
-    const height = 900;
-    const margin = { top: 120, right: 100, bottom: 180, left: 100 };
+    const width = 1000;
+    const height = 800;
+    const margin = { top: 120, right: 0, bottom: 100, left: 0 };
 
-    svg.attr("width", width).attr("height", height);
+    svg.attr("width", 1000) // Example
+   .attr("height", 800)
+   .style("margin", "0 auto");
     svg.selectAll("*").remove();
     const g = svg.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`);
 
@@ -108,7 +112,33 @@ export function document_embedding({svg, movie_corpus}) {
         .attr("text-anchor", "middle")
         .attr("font-size", 12)
         .attr("transform", (d) => `rotate(-45, ${xGenreScale(d)}, ${height - margin.top - margin.bottom + 40})`)
-        .text((d) => d);
+        .text((d) => d)
+        .style('cursor', 'pointer')
+        .on("click", function(event, d) {
+            const fontWeight = window.getComputedStyle(this).fontWeight;
+            const genreText = this.textContent;
+
+            if (fontWeight === "700" || fontWeight === "bold") {
+                this.style.fontWeight = "normal";
+                hideWorldCloud();
+
+                //TODO: unfilter target genre in set visualization
+
+            } else {
+                d3.selectAll("text.genre").style("font-weight", "normal");
+                d3.select(this).style("font-weight", "bold");
+
+                updateWordCloud(
+                    movie_corpus,
+                    genreText,
+                    15,
+                    15,
+                    color(genreText)
+                );
+
+                //TODO: filter target genre in set visualization
+            }
+        });
 
     const line = d3.line()
         .x((d) => d[0])
@@ -137,6 +167,8 @@ export function document_embedding({svg, movie_corpus}) {
                 .attr("stroke-opacity", 0.5);
         });
     });
+
+
 
     console.log("✅ Horizontal Set Membership Tree rendered.");
 }
