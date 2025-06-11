@@ -270,7 +270,7 @@ export function filterGenre(genre){
     d3.selectAll("circle")
         .transition()
         .duration(500)
-        .attr("opacity", d => (d.genres && d.genres.includes(genre) ? 0.7 : 0.2));
+        .attr("opacity", d => (d.genres && d.genres.includes(genre) ? 0.7 : 0.1));
 }
 
 export function resetGenreFilter(){
