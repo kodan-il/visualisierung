@@ -90,7 +90,7 @@ export function document_embedding({svg, movie_corpus}) {
 
     // Level labels
     g.append("g")
-        .selectAll("text.level")
+        .selectAll("text.level-label")
         .data(allLevels)
         .join("text")
         .attr("class", "level-label")
@@ -156,6 +156,9 @@ export function document_embedding({svg, movie_corpus}) {
             const yBottom = height - margin.top - margin.bottom - 20;
 
             g.append("path")
+                .attr("class", "genre-link")
+                .attr("data-genre", genre)
+                .attr("data-level", lvl)
                 .attr("class", "genre-link")
                 .attr("data-genre", genre)
                 .attr("data-level", lvl)
