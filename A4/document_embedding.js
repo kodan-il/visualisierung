@@ -93,7 +93,7 @@ export function document_embedding({svg, movie_corpus}) {
         .selectAll("text.level")
         .data(allLevels)
         .join("text")
-        .attr("class", "level")
+        .attr("class", "level-label")
         .attr("x", (d) => xLevelScale(d.toString()) + xLevelScale.bandwidth() / 2)
         .attr("y", 10)
         .attr("text-anchor", "middle")
@@ -156,6 +156,9 @@ export function document_embedding({svg, movie_corpus}) {
             const yBottom = height - margin.top - margin.bottom - 20;
 
             g.append("path")
+                .attr("class", "genre-link")
+                .attr("data-genre", genre)
+                .attr("data-level", lvl)
                 .attr("d", line([
                     [x, yTop],
                     [x, yBottom - 30],
@@ -165,10 +168,89 @@ export function document_embedding({svg, movie_corpus}) {
                 .attr("stroke", color(genre))
                 .attr("stroke-width", Math.max(0.5, Math.sqrt(val) * 0.7))
                 .attr("stroke-opacity", 0.5);
+
+            // Interactivity: on click genre label
+            g.selectAll("text.genre")
+                .style("cursor", "pointer")
+                .on("click", function (event, selectedGenre) {
+                    updateBarChartFilteredByGenre(selectedGenre);
+                    g.selectAll(".genre-link")
+                        .transition()
+                        .duration(300)
+                        .style("stroke-opacity", function () {
+                            return d3.select(this).attr("data-genre") === selectedGenre ? 0.9 : 0.1;
+                        });
+                });
+
+            // Interactivity: on click level label
+            g.selectAll("text.level-label")
+                .style("cursor", "pointer")
+                .on("click", function (event, selectedLevel) {
+                    resetBarChart();
+                    g.selectAll(".genre-link")
+                        .transition()
+                        .duration(300)
+                        .style("stroke-opacity", function () {
+                            return +d3.select(this).attr("data-level") === selectedLevel ? 0.9 : 0.1;
+                        });
+                });
         });
+    });
+    svg.on("click", function(event) {
+      // Clicking the SVG (not the child element) will reset the oppacity on all
+      if (event.target === this) {
+        g.selectAll(".genre-link")
+          .transition()
+          .duration(300)
+          .style("stroke-opacity", 0.5);
+        resetBarChart();
+      }
     });
 
 
+    function updateBarChartFilteredByGenre(selectedGenre) {
+      const newCounts = new Map();
 
+      movie_corpus.forEach((movie) => {
+        if (!Array.isArray(movie.genres)) return;
+        const genres = movie.genres.map((g) => g.trim());
+        if (!genres.includes(selectedGenre)) return;
+
+        const count = genres.length;
+        newCounts.set(count, (newCounts.get(count) || 0) + 1);
+      });
+
+      // Update bar heights
+      g.selectAll("rect")
+        .data(allLevels)
+        .transition()
+        .duration(500)
+        .attr("y", (d) => -yBarScale(newCounts.get(d) || 0))
+        .attr("height", (d) => yBarScale(newCounts.get(d) || 0));
+
+      // Update bar labels
+      g.selectAll("text.bar")
+        .data(allLevels)
+        .transition()
+        .duration(500)
+        .attr("y", (d) => -yBarScale(newCounts.get(d) || 0) - 8)
+        .text((d) => newCounts.get(d) || 0);
+    }
+
+    function resetBarChart() {
+      g.selectAll("rect")
+        .data(allLevels)
+        .transition()
+        .duration(500)
+        .attr("y", (d) => -yBarScale(genreCounts.get(d)))
+        .attr("height", (d) => yBarScale(genreCounts.get(d)));
+
+      g.selectAll("text.bar")
+        .data(allLevels)
+        .transition()
+        .duration(500)
+        .attr("y", (d) => -yBarScale(genreCounts.get(d)) - 8)
+        .text((d) => genreCounts.get(d));
+    }
     console.log("✅ Horizontal Set Membership Tree rendered.");
 }
