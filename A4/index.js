@@ -56,7 +56,6 @@ function renderWordCloud(words, color) {
                 .attr("text-anchor", "middle")
                 .attr("transform", (d) => `translate(${d.x}, ${d.y}) rotate(${d.rotate})`)
                 .text((d) => d.text)
-                /
                 .on("mouseenter", function (event, d) {
                     const wordData = words.find((word) => word[0] === d.text);
 
