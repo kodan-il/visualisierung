@@ -6,8 +6,7 @@ import {
 import { wordcloud } from "./src/wordcloud.js";
 
 import * as d3 from "d3"
-import { updateWordCloud } from './index.js';
-import { hideWorldCloud } from "./index.js";
+import { hideWorldCloud, filterGenre, resetGenreFilter, updateWordCloud} from './index.js';
 
 export function document_embedding({svg, movie_corpus}) {
     // log the corpus, so that you can analyse its stucture in the browser
@@ -113,32 +112,8 @@ export function document_embedding({svg, movie_corpus}) {
         .attr("font-size", 12)
         .attr("transform", (d) => `rotate(-45, ${xGenreScale(d)}, ${height - margin.top - margin.bottom + 40})`)
         .text((d) => d)
-        .style('cursor', 'pointer')
-        .on("click", function(event, d) {
-            const fontWeight = window.getComputedStyle(this).fontWeight;
-            const genreText = this.textContent;
+        .style('cursor', 'pointer');
 
-            if (fontWeight === "700" || fontWeight === "bold") {
-                this.style.fontWeight = "normal";
-                hideWorldCloud();
-
-                //TODO: unfilter target genre in set visualization
-
-            } else {
-                d3.selectAll("text.genre").style("font-weight", "normal");
-                d3.select(this).style("font-weight", "bold");
-
-                updateWordCloud(
-                    movie_corpus,
-                    genreText,
-                    15,
-                    15,
-                    color(genreText)
-                );
-
-                //TODO: filter target genre in set visualization
-            }
-        });
 
     const line = d3.line()
         .x((d) => d[0])
@@ -183,6 +158,16 @@ export function document_embedding({svg, movie_corpus}) {
                         .style("stroke-opacity", function () {
                             return d3.select(this).attr("data-genre") === selectedGenre ? 0.9 : 0.1;
                         });
+
+                    updateWordCloud(
+                        movie_corpus,
+                        selectedGenre,
+                        15,
+                        15,
+                        color(selectedGenre)
+                    );
+
+                    filterGenre(selectedGenre);
                 });
 
             // Interactivity: on click level label
@@ -207,6 +192,8 @@ export function document_embedding({svg, movie_corpus}) {
           .duration(300)
           .style("stroke-opacity", 0.5);
         resetBarChart();
+        hideWorldCloud();
+        resetGenreFilter();
       }
     });
 

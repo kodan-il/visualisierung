@@ -14,19 +14,18 @@ function renderWordCloud(words, color) {
         .select(`#wordcloud`)
         .attr("width", width)
         .attr("height", height)
-        .style("border", "1px solid #ddd")
         .style("margin", "0 auto")
         .style("visibility", "visible");
 
-    svg.selectAll("*").remove(); // Clear previous contents of the SVG
+    svg.selectAll("*").remove();
 
     // Select the tooltip div
     const tooltip = d3.select("#tooltip");
 
     const maxFrequency = Math.max(...words.map(([_, frequency]) => frequency));
 
-    const minFontSize = 1; // Set the smallest font size
-    const maxFontSize = 50; // Set the largest font size
+    const minFontSize = 10;
+    const maxFontSize = 90;
     const layout = cloud()
         .size([width, height])
         .words(
@@ -57,7 +56,7 @@ function renderWordCloud(words, color) {
                 .attr("text-anchor", "middle")
                 .attr("transform", (d) => `translate(${d.x}, ${d.y}) rotate(${d.rotate})`)
                 .text((d) => d.text)
-                // Add event listeners for tooltip
+                /
                 .on("mouseenter", function (event, d) {
                     const wordData = words.find((word) => word[0] === d.text);
 
@@ -70,13 +69,13 @@ function renderWordCloud(words, color) {
 
                 })
                 .on("mousemove", function (event) {
-                    // Update tooltip position based on mouse movement
+                    // Update tooltip position
                     tooltip
-                        .style("left", event.pageX + 10 + "px") // Offset to the right of the mouse
-                        .style("top", event.pageY + 10 + "px"); // Offset slightly below the mouse
+                        .style("left", event.pageX + 10 + "px")
+                        .style("top", event.pageY + 10 + "px");
                 })
                 .on("mouseleave", function () {
-                    // Hide the tooltip when the mouse leaves the word
+                    // Hide the tooltip
                     tooltip.style("display", "none");
                 });
         });
@@ -165,4 +164,119 @@ loadMoviesDataset().then((movies) => {
 
     //const targetGenre = "Action";
     //updateWordCloud(movies, targetGenre, 15, 15, genreColors[targetGenre]);
+
+    showEmbeddingScatterplot();
+
 });
+
+
+async function showEmbeddingScatterplot(){
+    const width = 800;
+    const height = 500;
+    const margin = { top: 50, right: 50, bottom: 50, left: 50 };
+
+    const embedding_data = await d3.csv("data/movies-embedding.csv", d3.autoType)
+    const movies_data = await d3.csv("data/movies.csv", d => ({
+        imdbId: d.imdbId,
+        genres: d.genres.split(",").map(g => g.trim()), // Transform genres into an array
+    }));
+
+    const genreLookup = new Map();
+    movies_data.forEach(movie => {
+        genreLookup.set(movie.imdbId, movie.genres);
+    });
+    const uniqueGenres = Array.from(
+        new Set(movies_data.flatMap(movie => movie.genres)) // Get all unique genres
+    );
+    const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain(uniqueGenres);
+
+    const scatterData = embedding_data.map(d => ({
+        x: d.x,
+        y: d.y,
+        genres: genreLookup.get(d.imdbId) || [], // Fetch genres for each imdbId
+        imdbId: d.imdbId,
+    }));
+
+    const svg = d3
+        .select("#embeding_plot")
+        .attr("width", width)
+        .attr("height", height)
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    const xScale = d3
+        .scaleLinear()
+        .domain(d3.extent(scatterData, d => d.x))
+        .range([0, width - margin.left - margin.right]);
+
+    const yScale = d3
+        .scaleLinear()
+        .domain(d3.extent(scatterData, d => d.y))
+        .range([height - margin.top - margin.bottom, 0]);
+
+    svg.selectAll("circle")
+        .data(scatterData)
+        .enter()
+        .append("circle")
+        .attr("cx", d => xScale(d.x))
+        .attr("cy", d => yScale(d.y))
+        .attr("r", 3)
+        .attr("fill", "blue")
+        .attr("opacity", 0.7)
+        .attr("stroke-width", 0.5)
+        .on("mouseenter", (event, d) => {
+            // Tooltip to show imdbId and genres
+            const tooltip = d3.select("#tooltip");
+            tooltip.style("display", "block")
+                .html(
+                    `<strong>IMDB ID:</strong> ${d.imdbId}<br>` +
+                    `<strong>Genres:</strong> ${d.genres.join(", ")}`
+                )
+                .style("left", event.pageX + 10 + "px")
+                .style("top", event.pageY + 10 + "px");
+        })
+        .on("mousemove", (event) => {
+            d3.select("#tooltip")
+                .style("left", event.pageX + 10 + "px")
+                .style("top", event.pageY + 10 + "px");
+        })
+        .on("mouseleave", () => {
+            d3.select("#tooltip").style("display", "none");
+        });
+
+    const xAxis = d3.axisBottom(xScale);
+    const yAxis = d3.axisLeft(yScale);
+
+    svg.append("g")
+        .attr("transform", `translate(0,${height - margin.top - margin.bottom})`)
+        .call(xAxis);
+
+    svg.append("g").call(yAxis);
+
+    svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", height - 10)
+        .attr("text-anchor", "middle")
+        .text("X");
+
+    svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -margin.left + 20)
+        .attr("text-anchor", "middle")
+        .text("Y");
+}
+
+export function filterGenre(genre){
+    d3.selectAll("circle")
+        .transition()
+        .duration(500)
+        .attr("opacity", d => (d.genres && d.genres.includes(genre) ? 0.7 : 0.2));
+}
+
+export function resetGenreFilter(){
+    d3.selectAll("circle")
+        .transition()
+        .duration(500)
+        .attr("opacity", 0.7);
+}
