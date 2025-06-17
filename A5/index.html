@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+                           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+                           crossorigin="anonymous">
+    <link rel="stylesheet" href="css/coloris.min.css"/>
+    <title>SciVis Lab Class Framework</title>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h4>SciVis Lab Class Framework</h4>
+                <canvas id="glcanvas" class="img-fluid" width="640" height="360"></canvas>
+            </div>
+        </div>
+        <div class="mx-auto mt-2 row">
+            <div class="col-sm-6">
+                <h4>General Settings</h4>
+                <div class="row mb-2">
+                    <div class="col-6">Frame Rate:</div>
+                    <div class="col-6"><output id="frameRateText">0</output> FPS</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-6">Volume</div>
+                    <div class="col-6"><select id="volumeList" onchange="selectVolume()"></select></div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-6">Canvas Resolution: </div>
+                    <div class="col-6"><select id="canvasSizeList" onchange="selectCanvasSize()"></select></div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-6">Active Shader Mode: </div>
+                    <div class="col-6"><select id="shaderList" onchange="selectShader()"></select></div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-sm">Background Colour: </div>
+                    <div class="col-sm"><input type="text" class="colorisRGB" value="rgb(200,200,200)" id="backgroundColorPicker" data-coloris oninput="changeBackgroundColour()"></div>
+                </div>
+                <h4 class="mt-4">Iso-surface Raycasting Settings</h4>
+                <div class="row mb-2">
+                    <div class="col-4">Iso-value:</div>
+                    <div class="col-1"><output id="isoValueText">127</output></div>
+                    <div class="col-1"><nobr>(<output id="isoValueTextNormalized">0.5</output>)</nobr></div>
+                    <div class="col-6"><input type="range" min="0" max="1" value="0.5" step="0.01" id="isoValueSlider" oninput="changeIsoValue()"></input></div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-5">Sampling Distance:</div>
+                    <div class="col-1"><output id="samplingDistanceText">0.01</output></div>
+                    <div class="col-6"><input type="range" min="0.003" max="0.05" value="0.02" step="0.001" id="samplingDistanceSlider" oninput="changeSamplingDistance()"></input></div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-sm">Binary Search</div>
+                    <div class="col-sm"><input type="checkbox" id="binarySearchCheckbox" oninput="changeBinarySearch()"></input></div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <h4>Lighting Settings</h4>
+                <div class="row mb-2">
+                    <div class="col-sm">Phong Illumination</div>
+                    <div class="col-sm"><input type="checkbox" id="illuminationCheckbox" oninput="changeIllumination()"></input></div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-3">Light Position</div>
+                    <div class="col-3">X <input style="width: 80px;" type="number" id="lightPosX" step="1" min="-10" max="10" onchange="changeLightPosition()"/></div>
+                    <div class="col-3">Y <input style="width: 80px;" type="number" id="lightPosY" step="1" min="-10" max="10" onchange="changeLightPosition()"/></div>
+                    <div class="col-3">Z <input style="width: 80px;" type="number" id="lightPosZ" step="1" min="-10" max="10" onchange="changeLightPosition()"/></div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-6">Specular reflection constant (k<sub>s</sub>):</div>
+                    <div class="col-1"><output id="specularConstantOutput">0</output></div>
+                    <div class="col-5"><input type="range" min="0" max="1" step="0.01" id="specularConstantSlider" oninput="changeIllumination()"></input></div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-6">Diffuse reflection constant (k<sub>d</sub>):</div>
+                    <div class="col-1"><output id="diffuseConstantOutput">0</output></div>
+                    <div class="col-5"><input type="range" min="0" max="1" step="0.01" id="diffuseConstantSlider" oninput="changeIllumination()"></input></div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-6">Ambient reflection constant (k<sub>a</sub>):</div>
+                    <div class="col-1"><output id="ambientConstantOutput">0</output></div>
+                    <div class="col-5"><input type="range" min="0" max="1" step="0.01" id="ambientConstantSlider" oninput="changeIllumination()"></input></div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-6">Shininess (&alpha;):</div>
+                    <div class="col-1"><output id="shininessConstantOutput">0</output></div>
+                    <div class="col-5"><input type="range" min="1" max="200" step="0.01" id="shininessConstantSlider" oninput="changeIllumination()"></input></div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-sm">Specular light intensity (i<sub>s</sub>): </div>
+                    <div class="col-sm"><input type="text" class="colorisRGB" value="white" id="specularLightIntensityPicker" data-coloris oninput="changeIllumination()"></div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-sm">Diffuse light intensity (i<sub>d</sub>): </div>
+                    <div class="col-sm"><input type="text" class="colorisRGB" value="rgb(255,0,0)" id="diffuseLightIntensityPicker" data-coloris oninput="changeIllumination()"></div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-sm">Ambient light intensity (i<sub>a</sub>): </div>
+                    <div class="col-sm"><input type="text" class="colorisRGB" value="rgb(255,0,0)" id="ambientLightIntensityPicker" data-coloris oninput="changeIllumination()"></div>
+                </div>
+            </div>
+        </div>  
+        
+        <div class="mt-2 row">
+            <div class="col-12 mt-lg-2 mt-0">
+                <p id="loadingText"></p>
+                <div class="progress mb-2">
+                    <div id="loadingProgressBar" class="progress-bar" role="progressbar"
+                                                                        aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="js/webgl-util.js"></script>
+    <script type="module" src="/coloris.min.js"></script>
+    <script type="module" src="/d3.v7.min.js"></script>
+    <script type="module" src="js/volume-raycaster.js"></script>
+</body>
+</html>
+
