@@ -52,12 +52,19 @@ void main(void) {
     // take tiny step in ray direction to make sure we are inside the volume bounds
 	p += ray_dir * 0.00001;
 
-	while (inside_volume_bounds(p)){
+	int num_samples = 0;
+	float intensity = 0.f;
 
+	while (inside_volume_bounds(p))
+	{
+		++ num_samples;
+		intensity += sample_data_volume(p);
 		p += ray_dir * sampling_distance;
-	
     }
 
+	float avg = intensity / float(num_samples);
 
+	avg *= 4.f;
+	color = vec4(avg, avg, avg, 1.f);
 
 }
