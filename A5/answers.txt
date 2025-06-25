@@ -1,8 +1,8 @@
 ### Answers
 #### 1.: What is the upper bound of the density value of the leaves in the Bonsai tree dataset? (That is, at what iso-value do the leaves disappear from the visualization?)
-When setting the iso-value above 0.25, the leaves of the Bonsai tree are no longer visible in the visualization,
+When setting the iso-value above 0.27, the leaves of the Bonsai tree are no longer visible in the visualization,
 indicating that this value represents the maximum density threshold for the leaf structures.
 
 #### 2.: What is the upper bound of the density value of the ‘body’ of the teapot?
 The majority of the body disappears at an iso-value of 0.50. However, small fragments remain visible until an iso-value
-of 0.56, with the upper visibility limit at approximately 0.57.
+of 0.55, with the upper visibility limit at approximately 0.56.
