@@ -1,0 +1,19 @@
+{
+  "name": "scivis-webgl",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "vite": "^6.2.2"
+  },
+  "dependencies": {
+    "gl-matrix": "^3.4.3"
+  }
+}
