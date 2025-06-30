@@ -72,4 +72,35 @@ void main(void) {
 	p += ray_dir * 0.00001;
 
 	// YOUR CODE HERE...
+
+	vec3 sample_intensity = vec3(0.0);
+	float opacity_sample = 0.0;
+
+	vec3 accumulated_intensity = vec3(0.0);
+	float accumulated_opacity = 0.0;
+
+	float current_sample = 0.0;
+	while(inside_volume_bounds(p)){
+		current_sample = sample_data_volume(p);
+
+		vec4 new_sample = sample_transfer_function(current_sample);
+		//color variable
+		vec3 color_sample = new_sample.rgb;
+		//opacity variable
+		opacity_sample = new_sample.a;
+
+		// This part is for calculating the intensity = color * opacity
+		sample_intensity = color_sample * opacity_sample;
+
+		accumulated_intensity += (1.0 - accumulated_opacity) * sample_intensity;
+		accumulated_opacity = 1.0 - (1.0 - accumulated_opacity) * (1.0 - opacity_sample);
+
+		//check if opacity is 1 then break;
+		if(opacity_sample >= 0.99) break;
+
+		p += ray_dir * sampling_distance;
+
+	}
+	color = vec4(accumulated_intensity, accumulated_opacity);
+
 }
