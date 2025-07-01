@@ -96,7 +96,7 @@ void main(void) {
 		accumulated_opacity = 1.0 - (1.0 - accumulated_opacity) * (1.0 - opacity_sample);
 
 		//check if opacity is 1 then break;
-		if(opacity_sample >= 0.99) break;
+		if(opacity_sample >= 1.0) break;
 
 		p += ray_dir * sampling_distance;
 
